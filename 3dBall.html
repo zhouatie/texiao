@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3d球</title>
+    <style>
+        * {padding:0;margin:0;}
+        body {background: black;}
+        #box {width:400px;height:400px;margin:100px auto;perspective: 1000px;}
+        #parent {width:100%;height:100%;position: relative;}
+        ul {width:20px;height:20px;transform-style: preserve-3d;position: absolute;left:50%;top:50%;}
+        li {list-style: none;position: absolute;left:0;top:0;backgrounde:green;width:20px;height:20px;font-size: 29px;}
+        .input {
+            position:absolute;
+            left:0;
+            top:0;
+        }
+        textarea {resize: none;font-size:15px;}
+        button {display:block;width:80px;height:30px;border-radius: 10px;
+            background-color: blue;
+            sposition: absolute;
+            sright:0;
+            stop:0;
+            color:white;
+        }
+    </style>
+    <script>
+        window.onload=function() {
+            var box=document.getElementById("box");
+            var parent=document.getElementById("parent");
+            var ul=document.createElement("ul");
+            var r=0;
+
+                bind();
+
+
+            function bind(){
+                var startx=0;
+                var starty=0;
+                var xx=0;
+                var yy=0;
+                document.onmousedown=function(e) {
+                    var event=e || window.event;
+                    var downx=event.pageX;
+                    var downy=event.pageY;
+                    document.onmousemove=function(e) {
+                        var event=e || window.event;
+                        var movex=event.pageX;
+                        var movey=event.pageY;
+                        xx=movex-downx;
+                        yy=downy-movey;
+                        if(starty+yy>80){
+                            yy=80-starty;
+                        }else if(starty+yy<-80){
+                            yy=-80-starty;
+                        }
+                        ul.style.transform="rotateX("+(starty+yy)+"deg) rotateY("+(startx+xx)+"deg)";
+                    };
+                    document.onmouseup=function() {
+                        document.onmousemove=null;
+                        startx=startx+xx;
+                        starty=starty+yy;
+                    };
+                };
+
+                var button=document.getElementsByTagName("button")[0];
+                var text=document.getElementById("text");
+                button.onclick=function() {
+                    var val=text.value;
+                    var str=val;
+                    ball(str);
+                };
+            }
+            function ball(str) {
+                ul.innerHTML="";
+                document.onselectstart = function(){return false;}
+                parent.appendChild(ul);
+                var index=0;
+                var arr=[];
+                while(Math.pow(index+1,2)+Math.pow(index,2)<=str.length){
+                    index++
+                }
+                index=index-1;
+                var long=0;
+                var hang=2*index+1;
+                for(var i=0;i<hang;i++){
+                    if(i<=index){
+                        arr[i]=str.substr(long,2*i+1);
+                        long+=2*i+1;
+                    }else{
+                        index--;
+                        arr[i]=str.substr(long,2*index+1);
+                        long+=2*index+1;
+                    }
+                }
+                var a=0;
+                var b=0;
+                var r=200;
+                var z=0;
+                var x=0;
+                var y=0;
+                for(var j=0;j<arr.length;j++){
+                    for(var i=0;i<arr[j].length;i++){
+                        y=parseInt(r*Math.cos(a));
+                        x=parseInt(r*Math.sin(a)*Math.sin(b));
+                        z=parseInt(r*Math.sin(a)*Math.cos(b));
+                        var li=document.createElement("li");
+                        li.innerHTML=arr[j][i];
+                        li.style.transform="translate3d("+x+"px,"+y+"px,"+z+"px)  rotateY("+b/Math.PI*180+"deg) rotateX("+(a/Math.PI*180-90)+"deg)";
+                        ul.appendChild(li);
+                        b+=2*Math.PI/(arr[j].length);
+                    }
+                    a+=Math.PI/(arr.length-1);
+                }
+            }
+            color()
+            function color() {
+                var timer=setInterval(function() {
+                    var lis=document.getElementsByTagName("li");
+                    for(var i=0;i<lis.length;i++){
+                        var r=parseInt(Math.random()*255);
+                        var g=parseInt(Math.random()*255);
+                        var b=parseInt(Math.random()*255);
+                        lis[i].style.color="rgb("+r+","+g+","+b+")";
+                    }
+                },500)
+
+            }
+        };
+    </script>
+</head>
+<body>
+<div id="box">
+    <div id="parent">
+    </div>
+</div>
+<div class="input">
+    <textarea name="" id="text" cols="30" rows="5" placeholder="请最好输入50个字"></textarea>
+    <button>发送</button>
+</div>
+</body>
+</html>
